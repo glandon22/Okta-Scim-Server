@@ -139,11 +139,13 @@ app.post('/scim/v2/Users',  function (req, res) {
                      + active + "','" + userName + "','" + givenName + "','" + middleName + "','"
                      + familyName + "')";
         db.run(runQuery, function(err) {
-          if(err !== null) {
+          if (err !== null) {
             var scim_error = SCIMError( String(err), "400");
             res.writeHead(400, {'Content-Type': 'text/plain'});
             res.end(JSON.stringify(scim_error));
-          } else {
+          } 
+          
+          else {
             var scimUserResource = GetSCIMUserResource(userId, active, userName,
               givenName, middleName, familyName, req_url); 
           
@@ -151,12 +153,16 @@ app.post('/scim/v2/Users',  function (req, res) {
             res.end(JSON.stringify(scimUserResource));
           }
         });              
-      } else {
+      } 
+      
+      else {
           var scim_error = SCIMError( "Conflict - Resource Already Exists", "409");
           res.writeHead(409, {'Content-Type': 'text/plain'});
           res.end(JSON.stringify(scim_error));
         }
-    } else {
+    } 
+    
+    else {
         var scim_error = SCIMError( String(err), "400");
         res.writeHead(400, {'Content-Type': 'text/plain'});
         res.end(JSON.stringify(scim_error));
