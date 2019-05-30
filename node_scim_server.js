@@ -121,50 +121,47 @@ function SCIMError(errorMessage, statusCode) {
 app.post('/scim/v2/Users',  function (req, res) {   
   var url_parts = url.parse(req.url, true);
   var req_url =  url_parts.pathname;
-  var requestBody = "";
 
- 	req.on('data', function (data) {
-    requestBody += data;
-		var userJsonData = JSON.parse(requestBody);
-		var active = userJsonData['active'];
-		var userName = userJsonData['userName'];
-		var givenName = userJsonData["name"]["givenName"];
-		var middleName = userJsonData["name"]["middleName"];
-		var familyName = userJsonData["name"]["familyName"];
+  const active = req.body.active;
+  const userName = req.body.userName;
+  const givenName = req.body.name.givenName;
+  const middleName = req.body.name.middleName;
+  const familyName = req.body.name.familyName;
+  
 
-    var usernameQuery = "SELECT * FROM Users WHERE userName='" + userName + "'";
-		db.get(usernameQuery, function(err, rows) {
-      if (err == null) {
-        if (rows === undefined) {
-          var userId = String(uuid.v1());
-          var runQuery = "INSERT INTO 'Users' (id, active, userName, givenName,\
-                       middleName, familyName) VALUES ('" + userId + "','" 
-                       + active + "','" + userName + "','" + givenName + "','"
-                       + familyName + "')";
-          db.run(runQuery, function(err) {
-            if(err !== null) {
-              var scim_error = SCIMError( String(err), "400");
-              res.writeHead(400, {'Content-Type': 'text/plain'});
-              res.end(JSON.stringify(scim_error));
-            } else {
-              var scimUserResource = GetSCIMUserResource(userId, active, userName,
-                givenName, middleName, familyName, req_url); 
-            
-              res.writeHead(201, {'Content-Type': 'text/json'});
-              res.end(JSON.stringify(scimUserResource));
-            }
-          });              
-        } else {
-            var scim_error = SCIMError( "Conflict - Resource Already Exists", "409");
-            res.writeHead(409, {'Content-Type': 'text/plain'});
+  var usernameQuery = "SELECT * FROM Users WHERE userName='" + userName + "'";
+  db.get(usernameQuery, function(err, rows) {
+    if (err == null) {
+      if (rows === undefined) {
+        var userId = String(uuid.v1());
+        var runQuery = "INSERT INTO 'Users' (id, active, userName, givenName,\
+                     middleName, familyName) VALUES ('" + userId + "','" 
+                     + active + "','" + userName + "','" + givenName + "','" + middleName + "','"
+                     + familyName + "')";
+        db.run(runQuery, function(err) {
+          if(err !== null) {
+            var scim_error = SCIMError( String(err), "400");
+            res.writeHead(400, {'Content-Type': 'text/plain'});
             res.end(JSON.stringify(scim_error));
+          } else {
+            var scimUserResource = GetSCIMUserResource(userId, active, userName,
+              givenName, middleName, familyName, req_url); 
+          
+            res.writeHead(201, {'Content-Type': 'text/json'});
+            res.end(JSON.stringify(scimUserResource));
           }
+        });              
       } else {
-          var scim_error = SCIMError( String(err), "400");
-          res.writeHead(400, {'Content-Type': 'text/plain'});
+          var scim_error = SCIMError( "Conflict - Resource Already Exists", "409");
+          res.writeHead(409, {'Content-Type': 'text/plain'});
           res.end(JSON.stringify(scim_error));
         }
-   }); 
+    } else {
+        var scim_error = SCIMError( String(err), "400");
+        res.writeHead(400, {'Content-Type': 'text/plain'});
+        res.end(JSON.stringify(scim_error));
+      }
+  
   }); 
 });
 
