@@ -50,6 +50,7 @@ Once all above is install run the node server "npm start". Make the following ca
 
 4) PUT {SCIM_Base_Url}/scim/v2/Users/<UserID>
 
+```json
 {
 schemas: 
   [ 'urn:ietf:params:scim:schemas:core:2.0:User'],
@@ -68,11 +69,5 @@ schemas:
   externalId: '<externalId>',
   groups: [] 
   }
-  
-  5) PATCH {SCIM_Base_Url}/scim/v2/Users/<UserID>
- 
-  {
-  "schemas":["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
-  "Operations":[{"op":"replace","value":{"active":true}}]
-  }
-  
+  ```
+5) DELETE {SCIM_Base_Url}/scim/v2/Users/:userID
