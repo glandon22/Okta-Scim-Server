@@ -52,22 +52,22 @@ Once all above is install run the node server "npm start". Make the following ca
 
 ```json
 {
-schemas: 
+"schemas": 
   [ "urn:ietf:params:scim:schemas:core:2.0:User"],
-  id: "a5222dc0-4dec-11e6-866c-5b600f3e2809",
-  userName: "username@example.com",
-  name: 
-   { givenName: "<GivenName>",
-     middleName: "undefined",
-     familyName: "<FamilyName>" },
-  active: "true",
-  meta: 
-   { resourceType: "User",
-     location: "<location uri>" },
-  emails: [ { primary: true, type: "work", value: "username@example.com" } ],
-  displayName: "<display Name>",
-  externalId: "<externalId>",
-  groups: [] 
+  "id": "a5222dc0-4dec-11e6-866c-5b600f3e2809",
+  "userName": "username@example.com",
+  "name": 
+   { "givenName": "<GivenName>",
+     "middleName": "undefined",
+     "familyName": "<FamilyName>" },
+  "active": "true",
+  "meta": 
+   { "resourceType": "User",
+     "location": "<location uri>" },
+  "emails": [ { "primary": true, "type": "work", "value": "username@example.com" } ],
+  "displayName": "<display Name>",
+  "externalId": "<externalId>",
+  "groups": [] 
   }
   ```
 5) DELETE {SCIM_Base_Url}/scim/v2/Users/:userID
