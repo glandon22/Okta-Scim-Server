@@ -20,6 +20,7 @@ const sqlite3 = require('sqlite3').verbose();
 const url = require('url');
 const uuid = require('uuid');
 const bodyParser = require('body-parser');
+const util = require('util');
 
 const db = new sqlite3.Database('test.db'); 
 
@@ -327,25 +328,42 @@ app.delete("/scim/v2/Users/:userID", function(req, res) {
 });
 
 app.post('/scim/v2/Groups/', function(req, res) {
+  const url_parts = url.parse(req.url, true);
+  const req_url =  url_parts.pathname;
 
+  
 });
 
 /**
  *  Instantiates or connects to DB
  */
 const server = app.listen(8081, function () {
-  const databaseQuery = "SELECT name FROM sqlite_master WHERE type='table' \
-                      AND name='Users'";
-  db.get(databaseQuery, function(err, rows) {
+  const databaseQuery = "SELECT name FROM sqlite_master WHERE type='table'";
+  db.all(databaseQuery, function(err, rows) {
     if(err !== null) { console.log(err); }
     else if(rows === undefined) {
       const createTable = 'CREATE TABLE Users ("id" primary key, \
-                        "active" INTEGER,"userName" VARCHAR(255), \
-                        "givenName" VARCHAR(255), "middleName" VARCHAR(255), \
-                        "familyName" VARCHAR(255))';
+        "active" INTEGER,"userName" VARCHAR(255), \
+        "givenName" VARCHAR(255), "middleName" VARCHAR(255), \
+        "familyName" VARCHAR(255))';
       db.run(createTable, function(err) {
         if(err !== null) { console.log(err); }
       });
+    }
+    else if (rows.length < 2) {
+      console.log(`we only found ${(util.inspect(rows,{showHidden: false, depth: null}))}`);
+      const createTable = 'CREATE TABLE Groups ("id" primary key, \
+        "active" INTEGER,"userName" VARCHAR(255), \
+        "givenName" VARCHAR(255), "middleName" VARCHAR(255), \
+        "familyName" VARCHAR(255))';
+      
+        db.run(createTable, function(err) {
+        if(err !== null) { console.log(err); }
+      });
+    }
+    else {
+
+      console.log((util.inspect(rows,{showHidden: false, depth: null})));
     }
   }); 
 });
