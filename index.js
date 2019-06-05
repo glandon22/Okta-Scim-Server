@@ -23,7 +23,6 @@ const bodyParser = require('body-parser');
 
 const db = new sqlite3.Database('test.db'); 
 
-app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -235,23 +234,6 @@ app.get("/scim/v2/Users/:userId", function (req, res){
   const queryById = "SELECT * FROM Users WHERE id='" + userId + "'";
 
   db.get(queryById, function(err, rows) {
-    /**if (err == null) {
-      if (rows === undefined){
-        const scim_error = SCIMError( "User Not Found", "404");
-        res.writeHead(404, {'Content-Type': 'text/plain'});
-        res.end(JSON.stringify(scim_error));
-      } else {        
-          const scimUserResource = GetSCIMUserResource(userId, rows.active, rows.userName,
-          rows.givenName, rows.middleName, rows.familyName, req_url);         
-          res.writeHead(200, {'Content-Type': 'application/json'})
-          res.end(JSON.stringify(scimUserResource));
-        }
-    } else {
-        const scim_error = SCIMError( String(err), "400");
-        res.writeHead(400, {'Content-Type': 'text/plain'});
-        res.end(JSON.stringify(scim_error));
-      }
-       */
       if (err) {
         const scim_error = SCIMError( String(err), "400");
         res.writeHead(400, {'Content-Type': 'text/plain'});
@@ -344,10 +326,9 @@ app.delete("/scim/v2/Users/:userID", function(req, res) {
   });
 });
 
-/**
- *  Default URL
- */
-app.get('/scim/v2', function (req, res) { res.send('SCIM'); });
+app.post('/scim/v2/Groups/', function(req, res) {
+
+});
 
 /**
  *  Instantiates or connects to DB
@@ -368,6 +349,3 @@ const server = app.listen(8081, function () {
     }
   }); 
 });
-
-
-
