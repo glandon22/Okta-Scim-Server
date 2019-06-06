@@ -1,0 +1,77 @@
+{
+    "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],
+    "id": "74c52bf3-d004-4abb-980d-7fe5a9706848",
+    "externalId": "787",
+    "userName": "gwright1",
+    "name": {
+      "formatted": null,
+      "familyName": "gg",
+      "givenName": "wq",
+      "middleName": "lq",
+      "honorificPrefix": "mar",
+      "honorificSuffix": null
+    },
+    "displayName": "lando",
+    "nickName": "louby",
+    "profileUrl": null,
+    "emails": [
+      {
+        "value": "",
+        "type": "",
+        "primary": true
+      }
+    ],
+    "addresses": [
+      {
+        "type": "",
+        "streetAddress": "",
+        "locality": "",
+        "region": "",
+        "postalCode": "",
+        "country": "",
+        "formatted": "",
+        "primary": true
+      }
+    ],
+    "phoneNumbers": [
+      {
+        "value": "",
+        "type": ""
+      }
+    ],
+    "photos": [
+      {
+        "value":
+          "",
+        "type": "photo"
+      }
+    ],
+    "userType": "Super ADMIN",
+    "title": "genius",
+    "preferredLanguage": "en-US",
+    "locale": "en-US",
+    "timezone": "America/New_York",
+    "active":true,
+    "password": "gogators",
+    "groups": [
+      {
+        "value": "",
+        "$ref": "",
+        "display": ""
+      }
+    ],
+    "x509Certificates": [
+      {
+        "value":
+         ""
+      }
+    ],
+    "meta": {
+      "resourceType": "User",
+      "created": "today",
+      "lastModified": "yesterday",
+      "version": "W\/\"a330bc54f0671c9\"",
+      "location":
+  "https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646"
+    }
+  }
