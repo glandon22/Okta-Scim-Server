@@ -27,6 +27,41 @@ const db = new sqlite3.Database('test.db');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+/**
+ * Create new db and tables
+ */
+
+ function createDBandTables() {
+    /*const createUserTable = 'CREATE TABLE Users ("id" primary key, \
+      "active" INTEGER,"userName" VARCHAR(255), \
+      "givenName" VARCHAR(255), "middleName" VARCHAR(255), \
+      "familyName" VARCHAR(255))';*/
+    const createUserTable = 'CREATE TABLE Users ("id" primary key, \
+    "externalId" VARCHAR(255), "userName" VARCHAR(255), \
+    "nameFormated" VARCHAR(255), "nameFamilyName" VARCHAR(255), \
+    "nameGivenName" VARCHAR(255), nameMiddleName VARCHAR(255), \
+    "nameHonorificPrefix" VARCHAR(255), nameHonorificSuffix VARCHAR(255), \
+    "displayName" VARCHAR(255), nickName VARCHAR(255), profileUrl VARCHAR(255), \
+    "emailsValue" VARCHAR(255), "emailsType" VARCHAR(255), "emailsPrimary" boolean, \
+    "addressesType" VARCHAR(255), "addressesStreetAddress" VARCHAR(255), \
+    "addressesLocality" VARCHAR(255), "addressesRegion" VARCHAR(255), \
+    "addressesPostalCode" VARCHAR(255), "addressesCountry" VARCHAR(255), \
+    "addressesFormatted" VARCHAR(255), "addressesPrimary" VARCHAR(255), \
+    "phoneNumbersValue" VARCHAR(255), "phoneNumbersType" VARCHAR(255), \
+    "photosValue" VARCHAR(255), "photosType" VARCHAR(255), "userType"  VARCHAR(255), \
+    "title" VARCHAR(255), "preferredLanguage" VARCHAR(255),  "locale" VARCHAR(255), \
+    "timezone" VARCHAR(255), "active" boolean, "password" VARCHAR(255), \
+    "x509CertificatesValue" VARCHAR(255), "metaResourceType" VARCHAR(255), \
+    "metaCreated" VARCHAR(255), "metaLastModified" VARCHAR(255), "metaVersion" VARCHAR(255), \
+    "metaLocation" VARCHAR(255))';
+    db.run(createUserTable, function(err) {
+      if(err !== null) { console.log(err); }
+      else {
+        console.log('successfully created new table');
+      }
+    });
+ }
+
 /** 
  *   Constructor for creating SCIM Resource 
  */
@@ -201,12 +236,14 @@ app.get("/scim/v2/Users", function (req, res) {
         const scim_error = SCIMError( "User Not Found", "404");
           res.writeHead(404, {'Content-Type': 'text/plain'});
           res.end(JSON.stringify(scim_error));
-      } else {
+      } 
+      
+      else {
           // If requested no. of users is less than all users
           if (rows.length < count) {
             count = rows.length
           }
-          
+          console.log(rows);
           const scimResource = GetSCIMList(rows,startIndex,count,req_url);
           res.writeHead(200, {'Content-Type': 'application/json'})
           res.end(JSON.stringify(scimResource))
@@ -340,30 +377,17 @@ app.post('/scim/v2/Groups/', function(req, res) {
 const server = app.listen(8081, function () {
   const databaseQuery = "SELECT name FROM sqlite_master WHERE type='table'";
   db.all(databaseQuery, function(err, rows) {
-    if(err !== null) { console.log(err); }
-    else if(rows === undefined) {
-      const createTable = 'CREATE TABLE Users ("id" primary key, \
-        "active" INTEGER,"userName" VARCHAR(255), \
-        "givenName" VARCHAR(255), "middleName" VARCHAR(255), \
-        "familyName" VARCHAR(255))';
-      db.run(createTable, function(err) {
-        if(err !== null) { console.log(err); }
-      });
+    if (err) {
+      console.log(err); 
     }
-    else if (rows.length < 2) {
-      console.log(`we only found ${(util.inspect(rows,{showHidden: false, depth: null}))}`);
-      const createTable = 'CREATE TABLE Groups ("id" primary key, \
-        "active" INTEGER,"userName" VARCHAR(255), \
-        "givenName" VARCHAR(255), "middleName" VARCHAR(255), \
-        "familyName" VARCHAR(255))';
-      
-        db.run(createTable, function(err) {
-        if(err !== null) { console.log(err); }
-      });
+    
+    else if(rows.length === 0) {
+      console.log('here');
+      createDBandTables();
     }
-    else {
 
-      console.log((util.inspect(rows,{showHidden: false, depth: null})));
+    else {
+      console.log(!!rows.length);
     }
-  }); 
+  });
 });
