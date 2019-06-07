@@ -1,0 +1,19 @@
+{
+    "schemas": ["urn:ietf:params:scim:schemas:core:2.0:Group"],
+    "id": "",
+    "displayName": "landons group",
+    "members": [
+      {
+        "value": "jimbo",
+        "$ref": "/somelinl/here",
+        "display": "Jimbo"
+      }
+    ],
+    "meta": {
+      "resourceType": "Group",
+      "created": "",
+      "lastModified": "",
+      "version": "W\/\"3694e05e9dff592\"",
+      "location": ""
+    }
+  }

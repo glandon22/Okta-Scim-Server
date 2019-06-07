@@ -22,7 +22,7 @@ const uuid = require('uuid');
 const bodyParser = require('body-parser');
 const util = require('util');
 const SCIMUserObject = require('./SCIMUserObject.json');
-const SCIMUserLookupTable = require('./SCIMUserLookupTable.json')
+const SCIMGroupObject = require('./SCIMGroupObject.json')
 
 const db = new sqlite3.Database('test.db'); 
 
@@ -46,10 +46,33 @@ app.use(bodyParser.json());
     "metaResourceType" VARCHAR(255), \
     "metaCreated" VARCHAR(255), "metaLastModified" VARCHAR(255), "metaVersion" VARCHAR(255), \
     "metaLocation" VARCHAR(255))';
+
+    const createGroupTable = 'CREATE TABLE Groups ("id" primary key, \
+    "displayName" VARCHAR(255), "metaResourceType" VARCHAR(255), \
+    "metaCreated" VARCHAR(255), "metaLastModified" VARCHAR(255), "metaVersion" VARCHAR(255), \
+    "metaLocation" VARCHAR(255))';
+
+    const createGroupMembersTable = 'CREATE TABLE GroupMembers ( "groupId" VARCHAR(255), value VARCHAR(255), \
+    "$ref" VARCHAR(255), "display" VARCHAR(255))';
+
     db.run(createUserTable, function(err) {
       if(err !== null) { console.log(err); }
       else {
-        console.log('successfully created new table');
+        console.log('successfully created new Users table');
+        db.run(createGroupTable, function(err) {
+          if (err !== null) { console.log(err); }
+          
+          else {
+            console.log('successfully created new Groups table');
+            db.run(createGroupMembersTable, function(err) {
+              if (err !== null) { console.log(err); }
+              
+              else {
+                console.log('successfully created new GroupMembers table');
+              }
+            });
+          }
+        });
       }
     });
  }
@@ -89,8 +112,8 @@ app.use(bodyParser.json());
   + userObject.active + "','"
   + userObject.password + "','"
   + userObject.meta.resourceType + "','"
-  + userObject.meta.created + "','"
-  + userObject.meta.lastModified + "','"
+  + new Date() + "','"
+  + new Date() + "','"
   + "W\/\"a330bc54f0671c9\"" + "','"
   + userObject.meta.location + "')";
 
@@ -123,10 +146,29 @@ function generateUpdateUsersQuery(userObject, userId) {
   + "' WHERE id = '" + userId + "'";
 }
 
+function generateGroupInsertQuery(groupObject, req_url) {
+  const groupId = String(uuid.v1());
+  const metaLocation = req_url + "/" + groupId;
+  const insertGroupFields = "INSERT INTO 'Groups' ('id', \
+  'displayName', 'metaResourceType', \
+  'metaCreated', 'metaLastModified', 'metaVersion', \
+  'metaLocation')";
+
+  const insertGroupValues = " VALUES ('" + groupId + "','"
+  + groupObject.displayName + "','"
+  + groupObject.meta.resourceType + "','" 
+  + new Date() + "','"
+  + new Date() + "','"
+  + "W\/\"3694e05e9dff592\"" + "','"
+  + metaLocation + "')";
+
+  return insertGroupFields + insertGroupValues;
+}
+
 /** 
  *   Constructor for creating SCIM Resource 
  */
-function GetSCIMList(rows, startIndex, count, req_url) {
+function GetSCIMList(rows, startIndex, count, req_url, objectType) {
   const scim_resource =  {
     "Resources": [], 
     "itemsPerPage": 0, 
@@ -136,21 +178,36 @@ function GetSCIMList(rows, startIndex, count, req_url) {
     "startIndex": 0, 
     "totalResults": 0
   }
-
   let resources = [];
-  let location = ""
-  for (let i = (startIndex-1); i < count; i++) {
-    location =  req_url + "/" + rows[i]["id"];
-    let userResource = GetSCIMUserResource(rows[i], location);
-    resources.push(userResource);
-    location = "";
+  let location = "";
+
+  if (objectType === 'user') {
+    for (let i = (startIndex-1); i < count; i++) {
+      location =  req_url + "/" + rows[i]["id"];
+      let userResource = GetSCIMUserResource(rows[i], location);
+      resources.push(userResource);
+      location = "";
+    }
   }
 
+  else if (objectType === 'group' ) {
+    for (let i = (startIndex-1); i < count; i++) {
+      location =  req_url + "/" + rows[i]["id"];
+      const userResource = GetSCIMGroupResource(rows[i], location);
+      //i have no idea why it is breaking here but
+      //if i dont clone the userResource obj it is passed into the array by reference
+      //and subsequently every obj in the array references the object returned in the final function call
+      //it works without needing to be cloned above....
+      const clone = {...userResource};
+      resources.push(clone);
+      location = "";
+    }
+  }
+  
   scim_resource["Resources"] = resources;
   scim_resource["startIndex"] = startIndex;
   scim_resource["itemsPerPage"] = count;
   scim_resource["totalResults"] = count
-
   return scim_resource;
 }
 
@@ -184,6 +241,20 @@ function GetSCIMUserResource(row, req_url) {
   scim_user.meta.location = req_url;
    
   return scim_user;
+}
+
+function GetSCIMGroupResource(row, req_url) {
+  let scim_group = SCIMGroupObject;
+
+  scim_group.id = row.id;
+  scim_group.displayName = row.displayName;
+  scim_group.meta.resourceType = row.metaResourceType;
+  scim_group.meta.created = row.metaCreated;
+  scim_group.meta.lastModified = row.metaLastModified;
+  scim_group.meta.version = row.metaVersion;
+  scim_group.meta.location = req_url;
+  
+  return scim_group;
 }
 
 /**
@@ -241,7 +312,6 @@ app.post('/scim/v2/Users',  function (req, res) {
       }
     }
   });
-  generateUserInsertQuery(req.body);
 });
 
 /**
@@ -282,7 +352,7 @@ app.get("/scim/v2/Users", function (req, res) {
             count = rows.length
           }
           console.log(rows);
-          const scimResource = GetSCIMList(rows,startIndex,count,req_url);
+          const scimResource = GetSCIMList(rows,startIndex,count,req_url, 'user');
           res.writeHead(200, {'Content-Type': 'application/json'})
           res.end(JSON.stringify(scimResource))
         }
@@ -356,8 +426,11 @@ app.put("/scim/v2/Users/:userId", function (req, res) {
           if (err) {
             console.log(err);
           }
+
+          else {
+            console.log('just updated user');
+          }
         });
-        //write logic to execute query and should be good to go
       }
 
       else {
@@ -367,50 +440,6 @@ app.put("/scim/v2/Users/:userId", function (req, res) {
       }
     }
   });
-  /*const active = req.body.active;
-  const userName = req.body.userName;
-  const givenName = req.body.name.givenName;
-  const middleName = req.body.name.middleName;
-  const familyName = req.body.name.familyName;
-  const queryById = "SELECT * FROM Users WHERE id='" + userId + "'";
-
-  db.get(queryById, function(err, rows) {
-    if (err == null) {
-      if (rows != undefined){
-        const updateUsersQuery = "UPDATE 'Users' SET userName = '" + String(userName)
-          + "', givenName = '" + String(givenName) + "', middleName ='"
-          + String(middleName) + "', familyName= '" + String(familyName)
-          + "'   WHERE id = '" + userId + "'";
-        
-        db.run(updateUsersQuery, function(err) {
-          if(err !== null) {
-            const scim_error = SCIMError( String(err), "400");
-            res.writeHead(400, {'Content-Type': 'text/plain'});
-            res.end(JSON.stringify(scim_error));
-          } 
-          
-          else {
-              const scimUserResource = GetSCIMUserResource(userId, active, userName,
-                givenName, middleName, familyName, req_url); 
-              res.writeHead(201, {'Content-Type': 'text/json'});
-              res.end(JSON.stringify(scimUserResource));
-            }
-        });
-      } 
-      
-      else {
-          const scim_error = SCIMError( "User Does Not Exist", "404");
-          res.writeHead(404, {'Content-Type': 'text/plain'});
-          res.end(JSON.stringify(scim_error));
-        }
-    } 
-    
-    else {
-        const scim_error = SCIMError( String(err), "400");
-        res.writeHead(400, {'Content-Type': 'text/plain'});
-        res.end(JSON.stringify(scim_error));
-      }
-  });*/
 });
 
 app.delete("/scim/v2/Users/:userID", function(req, res) {
@@ -428,9 +457,88 @@ app.delete("/scim/v2/Users/:userID", function(req, res) {
   });
 });
 
-app.post('/scim/v2/Groups/', function(req, res) {
+app.post('/scim/v2/Groups', function(req, res) {
   const url_parts = url.parse(req.url, true);
   const req_url =  url_parts.pathname;
+
+  const groupQuery = "SELECT * FROM Groups WHERE displayName='" + req.body.displayName + "'";
+  db.get(groupQuery, function(err, rows) {
+    if (err) {
+      const scim_error = SCIMError( String(err), "400");
+      res.writeHead(400, {'Content-Type': 'text/plain'});
+      res.end(JSON.stringify(scim_error));  
+    }
+
+    else {
+      if (rows) {
+        const scim_error = SCIMError( "Conflict - Resource Already Exists", "409");
+        res.writeHead(409, {'Content-Type': 'text/plain'});
+        res.end(JSON.stringify(scim_error));
+      }
+      //insert new group
+      else {
+        const query = generateGroupInsertQuery(req.body, req_url);
+        console.log(query);
+        db.run(query, function(err) {
+          if (err) {
+            const scim_error = SCIMError( String(err), "400");
+            res.writeHead(400, {'Content-Type': 'text/plain'});
+            res.end(JSON.stringify(scim_error));
+          }
+
+          else {
+            res.writeHead(201, {'Content-Type': 'text/json'});
+            res.end(JSON.stringify('created'));
+          }
+        });
+      }
+    }
+  });
+});
+
+app.get("/scim/v2/Groups", function (req, res) {
+  const url_parts = url.parse(req.url, true);
+  const query = url_parts.query;
+  startIndex  = query["startIndex"];
+  count = query["count"];
+  filter = query["filter"];
+
+  const req_url =  url_parts.pathname;
+  const selectQuery = "SELECT * FROM Groups";
+  let queryAtrribute = "";
+  let queryValue = "";
+
+  if (filter != undefined) {
+    queryAtrribute = String(filter.split("eq")[0]).trim();
+    queryValue = String(filter.split("eq")[1]).trim();
+    selectQuery = "SELECT * FROM Groups " + queryAtrribute + " = " + queryValue;
+  }
+
+  db.all(selectQuery , function(err, rows) {
+    if (err == null) {
+      if (rows === undefined) {
+        const scim_error = SCIMError( "Group Not Found", "404");
+          res.writeHead(404, {'Content-Type': 'text/plain'});
+          res.end(JSON.stringify(scim_error));
+      } 
+      
+      else {
+          // If requested no. of users is less than all users
+          if (rows.length < count) {
+            count = rows.length
+          }
+          const scimResource = GetSCIMList(rows,startIndex,count,req_url, 'group');
+          res.writeHead(200, {'Content-Type': 'application/json'})
+          res.end(JSON.stringify(scimResource))
+        }
+    } 
+    
+    else {
+        const scim_error = SCIMError( String(err), "400");
+        res.writeHead(400, {'Content-Type': 'text/plain'});
+        res.end(JSON.stringify(scim_error));
+      }
+  });
 });
 
 /**
