@@ -352,6 +352,11 @@ app.put("/scim/v2/Users/:userId", function (req, res) {
       if (rows) {
         const updateQuery = generateUpdateUsersQuery(req.body, userId);
         console.log(updateQuery);
+        db.run(updateQuery, function(err) {
+          if (err) {
+            console.log(err);
+          }
+        });
         //write logic to execute query and should be good to go
       }
 
