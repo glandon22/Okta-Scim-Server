@@ -145,7 +145,17 @@ function generateUpdateUsersQuery(userObject, userId) {
   + "', metaLocation ='" + String(userObject.meta.location)
   + "' WHERE id = '" + userId + "'";
 }
-
+/* WIP
+function generateGroupUpdateQuery(groupObject, groupId) {
+  return "UPDATE 'Group' SET displayName = '" + String(groupObject.displayName)
+  + "', metaResourceType = '" + String(groupObject.meta.resourceType)
+  + "', metaCreated = '" + String(groupObject.userName)
+  + "', metaCreated = '" + String(groupObject.userName)
+  + "', metaCreated = '" + String(groupObject.userName)
+  + "', metaCreated = '" + String(groupObject.userName)
+  + "' WHERE id = '" + userId + "'";
+}
+*/
 function generateGroupInsertQuery(groupObject, req_url) {
   const groupId = String(uuid.v1());
   const metaLocation = req_url + "/" + groupId;
@@ -540,6 +550,48 @@ app.get("/scim/v2/Groups", function (req, res) {
       }
   });
 });
+
+/**
+ *  Update Group attributes via PUT
+ */
+/* WIP
+app.put("/scim/v2/Groups/:groupId", function (req, res) {
+	const groupId = req.params.groupId;
+	const url_parts = url.parse(req.url, true);
+  const req_url = url_parts.pathname;
+  console.log(req.body.userId);
+  const queryById = "SELECT * FROM Groups WHERE id='" + groupId + "'";
+  db.get(queryById, function(err, rows) {
+    if (err) {
+      const scim_error = SCIMError( String(err), "400");
+      res.writeHead(400, {'Content-Type': 'text/plain'});
+      res.end(JSON.stringify(scim_error));
+    }
+
+    else {
+      if (rows) {
+        const updateQuery = generateUpdateUsersQuery(req.body, groupId);
+        console.log(updateQuery);
+        db.run(updateQuery, function(err) {
+          if (err) {
+            console.log(err);
+          }
+
+          else {
+            console.log('just updated user');
+          }
+        });
+      }
+
+      else {
+        const scim_error = SCIMError( "Group Does Not Exist", "404");
+        res.writeHead(404, {'Content-Type': 'text/plain'});
+        res.end(JSON.stringify(scim_error));
+      }
+    }
+  });
+});
+*/
 
 /**
  *  Instantiates or connects to DB

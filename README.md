@@ -20,54 +20,16 @@ Once all above is install run the node server "npm start". Make the following ca
 
 1) POST {SCIM_Base_Url}/scim/v2/Users
 ```json
-{  
-   "schemas":[  
-      "urn:ietf:params:scim:schemas:core:2.0:User"
-   ],
-   "userName":"username@example.com",
-   "name":{  
-      "givenName":"<GivenName>",
-      "middleName":"",
-      "familyName":"<FaimlyName>"
-   },
-   "emails":[  
-      {  
-         "primary":true,
-         "value":"username@example.com",
-         "type":"work"
-      }
-   ],
-   "displayName":"<display name>","externalId":"<externalId>","groups":[  
-
-   ],
-   "active":true
-}
+{"schemas":["urn:ietf:params:scim:schemas:core:2.0:User"],"id":"74c52bf3-d004-4abb-980d-7fe5a9706848","externalId":"777","userName":"gwright","name":{"formatted":null,"familyName":"g","givenName":"w","middleName":"l","honorificPrefix":"mr","honorificSuffix":null},"displayName":"landolf","nickName":"lou","profileUrl":null,"emails":[{"value":"","type":"","primary":true}],"addresses":[{"type":"","streetAddress":"","locality":"","region":"","postalCode":"","country":"","formatted":"","primary":true}],"phoneNumbers":[{"value":"","type":""}],"photos":[{"value":"","type":"photo"}],"userType":"Admin","title":"savant","preferredLanguage":"en-US","locale":"en-US","timezone":"America/New_York","active":true,"password":"gogators","groups":[{"value":"","$ref":"","display":""}],"x509Certificates":[{"value":""}],"meta":{"resourceType":"User","created":"today","lastModified":"yesterday","version":"W\/\"a330bc54f0671c9\"","location":"https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646"}}
 ```
 
 2) GET {SCIM_Base_Url}/scim/v2/Users?count=2&startIndex=1
 
-3) GET {SCIM_Base_Url}/scim/v2/Users?count=1&filter=userName eq "username@example.com"&startIndex=1
+3) GET {SCIM_Base_Url}/scim/v2/Users?count=1&filter=gwright eq "gwright"&startIndex=1
 
 4) PUT {SCIM_Base_Url}/scim/v2/Users/<UserID>
 
 ```json
-{
-"schemas": 
-  [ "urn:ietf:params:scim:schemas:core:2.0:User"],
-  "id": "a5222dc0-4dec-11e6-866c-5b600f3e2809",
-  "userName": "username@example.com",
-  "name": 
-   { "givenName": "<GivenName>",
-     "middleName": "undefined",
-     "familyName": "<FamilyName>" },
-  "active": "true",
-  "meta": 
-   { "resourceType": "User",
-     "location": "<location uri>" },
-  "emails": [ { "primary": true, "type": "work", "value": "username@example.com" } ],
-  "displayName": "<display Name>",
-  "externalId": "<externalId>",
-  "groups": [] 
-  }
+{"schemas":["urn:ietf:params:scim:schemas:core:2.0:User"],"id":"74c52bf3-d004-4abb-980d-7fe5a9706848","externalId":"787","userName":"gwright1","name":{"formatted":null,"familyName":"gg","givenName":"wq","middleName":"lq","honorificPrefix":"mar","honorificSuffix":null},"displayName":"lando","nickName":"louby","profileUrl":null,"emails":[{"value":"","type":"","primary":true}],"addresses":[{"type":"","streetAddress":"","locality":"","region":"","postalCode":"","country":"","formatted":"","primary":true}],"phoneNumbers":[{"value":"","type":""}],"photos":[{"value":"","type":"photo"}],"userType":"SuperADMIN","title":"genius","preferredLanguage":"en-US","locale":"en-US","timezone":"America/New_York","active":true,"password":"gogators","groups":[{"value":"","$ref":"","display":""}],"x509Certificates":[{"value":""}],"meta":{"resourceType":"User","created":"today","lastModified":"yesterday","version":"W\/\"a330bc54f0671c9\"","location":"https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646"}}
   ```
 5) DELETE {SCIM_Base_Url}/scim/v2/Users/:userID
