@@ -1,18 +1,18 @@
 {
     "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],
-    "id": "",
-    "externalId": "",
-    "userName": "",
+    "id": "74c52bf3-d004-4abb-980d-7fe5a9706848",
+    "externalId": "777",
+    "userName": "gwright",
     "name": {
       "formatted": null,
-      "familyName": "",
-      "givenName": "",
-      "middleName": "",
-      "honorificPrefix": "",
+      "familyName": "g",
+      "givenName": "w",
+      "middleName": "l",
+      "honorificPrefix": "mr",
       "honorificSuffix": null
     },
-    "displayName": "",
-    "nickName": "",
+    "displayName": "landolf",
+    "nickName": "lou",
     "profileUrl": null,
     "emails": [
       {
@@ -46,13 +46,13 @@
         "type": "photo"
       }
     ],
-    "userType": "",
-    "title": "",
+    "userType": "Admin",
+    "title": "savant",
     "preferredLanguage": "en-US",
     "locale": "en-US",
     "timezone": "America/New_York",
     "active":true,
-    "password": "",
+    "password": "gogators",
     "groups": [
       {
         "value": "",
@@ -68,8 +68,8 @@
     ],
     "meta": {
       "resourceType": "User",
-      "created": "",
-      "lastModified": "",
+      "created": "today",
+      "lastModified": "yesterday",
       "version": "W\/\"a330bc54f0671c9\"",
       "location":
   "https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646"

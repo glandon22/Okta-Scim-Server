@@ -1,0 +1,30 @@
+{
+    "id": "",
+    "externalId": "",
+    "userName": "",
+    "name": {
+      "formatted": null,
+      "familyName": "",
+      "givenName": "",
+      "middleName": "",
+      "honorificPrefix": "",
+      "honorificSuffix": null
+    },
+    "displayName": "",
+    "nickName": "",
+    "profileUrl": null,
+    "userType": "",
+    "title": "",
+    "preferredLanguage": "en-US",
+    "locale": "en-US",
+    "timezone": "America/New_York",
+    "active":true,
+    "password": "",
+    "meta": {
+      "resourceType": "User",
+      "created": "",
+      "lastModified": "",
+      "location":
+  "https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646"
+    }
+  }
